@@ -100,3 +100,19 @@ body {
     background-color: #a5a5a5;
     color: black;
 }
+
+.number:hover {
+    transition: background-color 0.5s;
+    background-color: #ffffff82;
+}
+
+.row .gray-btn:hover {
+    transition: background-color 0.5s;
+    background-color: #ffffffe6;
+}
+
+.row .col-last:hover {
+    transition:all 0.5s;
+    color: #ff9e30;
+    background-color:white;
+}
