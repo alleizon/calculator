@@ -91,7 +91,7 @@ body {
     color:white;
 }
 
-.row .col-last {
+.row .operator {
     background-color: #ff9e30;
     color:white;
 }
@@ -111,7 +111,7 @@ body {
     background-color: #ffffffe6;
 }
 
-.row .col-last:hover {
+.row .operator:hover, .operator-activated {
     transition:all 0.5s;
     color: #ff9e30;
     background-color:white;
