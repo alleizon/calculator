@@ -7,7 +7,7 @@ const operatorBtns = document.querySelectorAll(".operator");
 const plusMinus = document.querySelector("#plus-minus")
 const clearBtn = document.querySelector("#clear")
 
-let currentNumber = currentText.innerText;
+let currentNumber = '';
 
 // Event listeners for numbers
 
@@ -41,6 +41,11 @@ function updateCurrentField(e) {
     let containsDot = currentNumber.includes(".") ? true : false;
 
     if ((number === '.') && containsDot) return;
+    if (!currentNumber && number === '.') {
+        currentNumber = '0.';
+        currentText.innerText = '0.';
+        return;
+    }
 
     let length;
     const re = /\s/g;
