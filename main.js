@@ -7,14 +7,17 @@ const operatorBtns = document.querySelectorAll(".operator");
 const plusMinus = document.querySelector("#plus-minus")
 const clearBtn = document.querySelector("#clear")
 
-let currentNumber = '';
-
-// Event listeners for numbers
-
 const numberBtnsArray = Array.from(numberBtns);
+const operatorBtnsArray = Array.from(operatorBtns); 
+
+// Event listeners
 
 numberBtnsArray.forEach(item => {
-   item.addEventListener('click', updateCurrentField); 
+    item.addEventListener('click', updateCurrentField); 
+});
+
+operatorBtnsArray.forEach(item => {
+    item.addEventListener('click', operate);
 });
 
 
@@ -26,15 +29,21 @@ numberBtnsArray.forEach(item => {
 
 
 
+// Variables
 
+let currentNumber = '';
+let storedNumber;
 
+const operators = {
+    add: ['+', add],
+    subtract: ['-', subtract],
+    multiply: ['×', multiply],
+    divide: ['÷', divide],
+}
 
+let currentOperator;
 
-
-
-
-
-
+// Functions
 
 function updateCurrentField(e) {
     const number = e.target.textContent;
@@ -56,7 +65,6 @@ function updateCurrentField(e) {
 
     currentNumber += number;
     const formattedNumber = formatNumber(currentNumber.replace(re, ''));
-    console.log(currentNumber, currentNumber.replace(re, '').length);
 
     currentText.innerText = formattedNumber;
 }
@@ -70,17 +78,17 @@ function formatNumber(numberString) {
     const numberArray = numberBeforeDot.split('');
     const length = numberBeforeDot.length;
     if (length > 3) {
-        const numberOfSpaces = Math.floor(length/3);
+        const numberOfSpaces = (length % 3) == 0 ? Math.floor(length/3) - 1 : Math.floor(length/3);
         const firstSpaceIndex = length % 3 ? length % 3 : 3;
         let newIndex = firstSpaceIndex;
         let addedSpaces = 0;
         for (let i = 0; i<numberOfSpaces; i++) {
             if (i==0) {
-                numberArray.splice(firstSpaceIndex,0,' ');
+                numberArray.splice(firstSpaceIndex, 0, ' ');
                 addedSpaces++;
             }
             else {
-                numberArray.splice(newIndex+addedSpaces,0,' '); 
+                numberArray.splice(newIndex+addedSpaces, 0, ' '); 
                 addedSpaces++
             }
 
@@ -88,4 +96,37 @@ function formatNumber(numberString) {
         }
     }
     return numberArray.join('')+afterDot;
+}
+
+function operate(event) {
+    let operator = event.target.id;
+    let operatorSymbol = operators[operator][0];
+    
+    if (!currentNumber) {
+        currentOperator = operator;
+        previousText.innerText = storedNumber + ' ' + operators[operator][0];
+        return;
+    }
+
+    let result = storedNumber ? operators[currentOperator][1](+storedNumber, +currentNumber) : undefined;
+    
+    currentText.innerText = '0';
+    previousText.innerText = (result || result === 0 ? formatNumber(String(result)) : formatNumber(currentNumber)) + ' ' + operatorSymbol;
+    
+    storedNumber = storedNumber ? result : currentNumber;
+    currentOperator = operator;
+    currentNumber = '';
+}
+
+function add(x,y){
+    return x+y;
+}
+function subtract(x,y){
+    return x-y;
+}
+function multiply(x,y){
+    return x*y;
+}
+function divide(x,y){
+    return x/y;
 }
