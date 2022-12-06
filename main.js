@@ -107,7 +107,6 @@ function formatNumber(numberString) {
 }
 
 function operate(event) {
-    console.log(Boolean(currentNumber));
     let operator = event.target.id;
     let operatorSymbol = operators[operator][0];
     
@@ -122,7 +121,7 @@ function operate(event) {
         if (!storedNumber && currentOperator == 'equal') return;
         if (storedNumber) {
             let result = operators[currentOperator][1](+storedNumber, +currentNumber);
-            currentText.innerText = formatNumber(String(result));
+            currentText.innerText = result ? formatNumber(String(result)) : 'yikes';
             currentNumber = String(result);
             storedNumber = null;
             previousText.innerText = '';
@@ -151,5 +150,6 @@ function multiply(x,y){
     return x*y;
 }
 function divide(x,y){
+    if (y === 0) return;
     return x/y;
 }
