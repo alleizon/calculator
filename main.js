@@ -39,6 +39,7 @@ const operators = {
     subtract: ['-', subtract],
     multiply: ['×', multiply],
     divide: ['÷', divide],
+    equal: ['=', equal],
 }
 
 let currentOperator;
@@ -46,8 +47,15 @@ let currentOperator;
 // Functions
 
 function updateCurrentField(e) {
+    if (currentOperator == 'equal') {
+        currentNumber = '';
+        currentOperator = undefined;
+    };
+
     const number = e.target.textContent;
     let containsDot = currentNumber.includes(".") ? true : false;
+
+    if (number === '0' && !currentNumber) return;
 
     if ((number === '.') && containsDot) return;
     if (!currentNumber && number === '.') {
@@ -65,8 +73,8 @@ function updateCurrentField(e) {
 
     currentNumber += number;
     const formattedNumber = formatNumber(currentNumber.replace(re, ''));
-
     currentText.innerText = formattedNumber;
+
 }
 
 function formatNumber(numberString) {
@@ -99,13 +107,28 @@ function formatNumber(numberString) {
 }
 
 function operate(event) {
+    console.log(Boolean(currentNumber));
     let operator = event.target.id;
     let operatorSymbol = operators[operator][0];
     
-    if (!currentNumber) {
+    if (!currentNumber && operator != 'equal' && storedNumber) {
         currentOperator = operator;
         previousText.innerText = storedNumber + ' ' + operators[operator][0];
         return;
+    }
+
+    if (operator == 'equal') {
+        if (!currentOperator) return;
+        if (!storedNumber && currentOperator == 'equal') return;
+        if (storedNumber) {
+            let result = operators[currentOperator][1](+storedNumber, +currentNumber);
+            currentText.innerText = formatNumber(String(result));
+            currentNumber = String(result);
+            storedNumber = null;
+            previousText.innerText = '';
+            currentOperator = 'equal';
+            return;
+        }
     }
 
     let result = storedNumber ? operators[currentOperator][1](+storedNumber, +currentNumber) : undefined;
