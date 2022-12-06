@@ -20,7 +20,7 @@ operatorBtnsArray.forEach(item => {
     item.addEventListener('click', operate);
 });
 
-
+clearBtn.addEventListener('click', clear);
 
 
 
@@ -103,7 +103,7 @@ function formatNumber(numberString) {
             newIndex += 3;
         }
     }
-    return numberArray.join('')+afterDot;
+    return numberArray.join('') + afterDot;
 }
 
 function operate(event) {
@@ -121,6 +121,12 @@ function operate(event) {
         if (!storedNumber && currentOperator == 'equal') return;
         if (storedNumber) {
             let result = operators[currentOperator][1](+storedNumber, +currentNumber);
+            const resultLength = String(result).replace(/[.]/, '').length;
+            if (resultLength > 12) {
+                clear();
+                currentText.innerText = 'Number is too big';
+                return;
+            }
             currentText.innerText = result ? formatNumber(String(result)) : 'yikes';
             currentNumber = String(result);
             storedNumber = null;
@@ -132,9 +138,19 @@ function operate(event) {
 
     let result = storedNumber ? operators[currentOperator][1](+storedNumber, +currentNumber) : undefined;
     
+    if (result) {
+        const resultLength = String(result).replace(/[.]/, '').length;
+        if (resultLength > 12) {
+            clear();
+            currentText.innerText = 'Number is too big';
+            return;
+        }
+    }
+    if (result || currentNumber) {        
+        previousText.innerText = (result || result === 0 ? formatNumber(String(result)) : formatNumber(currentNumber)) + ' ' + operatorSymbol;
+    };
+
     currentText.innerText = '0';
-    previousText.innerText = (result || result === 0 ? formatNumber(String(result)) : formatNumber(currentNumber)) + ' ' + operatorSymbol;
-    
     storedNumber = storedNumber ? result : currentNumber;
     currentOperator = operator;
     currentNumber = '';
@@ -152,4 +168,12 @@ function multiply(x,y){
 function divide(x,y){
     if (y === 0) return;
     return x/y;
+}
+
+function clear() {
+    currentNumber = '';
+    storedNumber = undefined;
+    currentOperator = undefined;
+    previousText.innerText = '';
+    currentText.innerText = '0';
 }
