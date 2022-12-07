@@ -107,12 +107,11 @@ function formatNumber(numberString) {
 }
 
 function operate(event) {
-    // TODO : fix bug decimals overflow (check 1.56 + 3)
-
     let operator = event.target.id;
     let operatorSymbol = operators[operator][0];
     
     if (!currentNumber && operator != 'equal' && storedNumber) {
+        styleOperatorBtn(event);
         currentOperator = operator;
         previousText.innerText = storedNumber + ' ' + operators[operator][0];
         return;
@@ -134,6 +133,7 @@ function operate(event) {
             storedNumber = null;
             previousText.innerText = '';
             currentOperator = 'equal';
+            styleOperatorBtn(event);
             return;
         }
     }
@@ -154,28 +154,33 @@ function operate(event) {
 
     currentText.innerText = '0';
     storedNumber = storedNumber ? result : currentNumber;
+    if (storedNumber) styleOperatorBtn(event);
     currentOperator = operator;
     currentNumber = '';
 }
 
 function add(x,y){
     const sum = x+y;
+    if (Number.isInteger(sum)) return sum;
     const digitsAfterPoint = calcDecimals(x, y)
     return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 function subtract(x,y){
     const sum = x-y;
+    if (Number.isInteger(sum)) return sum;
     const digitsAfterPoint = calcDecimals(x, y)
     return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 function multiply(x,y){
     const sum = x*y;
+    if (Number.isInteger(sum)) return sum;
     const digitsAfterPoint = calcDecimals(x, y)
     return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 function divide(x,y){
     if (y === 0) return;
     const sum = x/y;
+    if (Number.isInteger(sum)) return sum;
     const digitsAfterPoint = calcDecimals(x, y)
     return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
@@ -186,6 +191,7 @@ function clear() {
     currentOperator = undefined;
     previousText.innerText = '';
     currentText.innerText = '0';
+    styleOperatorBtn();
 }
 
 function calcDecimals(x, y) {
@@ -194,4 +200,14 @@ function calcDecimals(x, y) {
     xLength = xArray ? xArray[1].length : 0;
     yLength = yArray ? yArray[1].length : 0;
     return xLength>yLength ? xLength : yLength;
+}
+
+function styleOperatorBtn(e) {
+    if (!e || e.target.id == 'equal') {
+        operatorBtnsArray.forEach(item => item.classList.remove('operator-activated'));
+    } else {
+        const previousBtn = currentOperator ? document.querySelector(`#${currentOperator}`) : e.target;
+        previousBtn.classList.remove('operator-activated');
+        e.target.classList.add('operator-activated');    
+    }
 }

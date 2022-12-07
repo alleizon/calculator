@@ -111,7 +111,7 @@ body {
     background-color: #ffffffe6;
 }
 
-.row .operator:hover, .operator-activated {
+.row .operator:hover, .operator.operator-activated {
     transition:all 0.5s;
     color: #ff9e30;
     background-color:white;
