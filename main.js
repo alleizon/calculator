@@ -107,6 +107,8 @@ function formatNumber(numberString) {
 }
 
 function operate(event) {
+    // TODO : fix bug decimals overflow (check 1.56 + 3)
+
     let operator = event.target.id;
     let operatorSymbol = operators[operator][0];
     
@@ -157,17 +159,25 @@ function operate(event) {
 }
 
 function add(x,y){
-    return x+y;
+    const sum = x+y;
+    const digitsAfterPoint = calcDecimals(x, y)
+    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 function subtract(x,y){
-    return x-y;
+    const sum = x-y;
+    const digitsAfterPoint = calcDecimals(x, y)
+    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 function multiply(x,y){
-    return x*y;
+    const sum = x*y;
+    const digitsAfterPoint = calcDecimals(x, y)
+    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 function divide(x,y){
     if (y === 0) return;
-    return x/y;
+    const sum = x/y;
+    const digitsAfterPoint = calcDecimals(x, y)
+    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
 }
 
 function clear() {
@@ -176,4 +186,12 @@ function clear() {
     currentOperator = undefined;
     previousText.innerText = '';
     currentText.innerText = '0';
+}
+
+function calcDecimals(x, y) {
+    const xArray = x.toString(10).includes('.') ? x.toString(10).split('.') : 0;
+    const yArray = y.toString(10).includes('.') ? y.toString(10).split('.') : 0;
+    xLength = xArray ? xArray[1].length : 0;
+    yLength = yArray ? yArray[1].length : 0;
+    return xLength>yLength ? xLength : yLength;
 }
