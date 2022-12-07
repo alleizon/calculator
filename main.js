@@ -22,17 +22,18 @@ operatorBtnsArray.forEach(item => {
 
 clearBtn.addEventListener('click', clear);
 
-
-
-
-
-
-
+plusMinus.addEventListener('click', () => {
+    addedMinus = !addedMinus;
+    if (addedMinus) {
+        currentText.innerText = '-' + currentText.innerText; 
+    } else currentText.innerText = currentText.innerText.replace(/[-]/g, '');
+})
 
 // Variables
 
 let currentNumber = '';
 let storedNumber;
+let addedMinus = false;
 
 const operators = {
     add: ['+', add],
@@ -64,12 +65,11 @@ function updateCurrentField(e) {
         return;
     }
 
-    let length;
-    const re = /\s/g;
-    if (containsDot) length = currentNumber.replace(re, '').length-1;
-    else length = currentNumber.replace(re, '').length;
-
-    if (length >= 12) return;
+    let currentNumberLength;
+    const re = /[-\s]/g;
+    if (containsDot) currentNumberLength = currentNumber.replace(re, '').length-1;
+    else currentNumberLength = currentNumber.replace(re, '').length;
+    if (currentNumberLength >= 12) return;
 
     currentNumber += number;
     const formattedNumber = formatNumber(currentNumber.replace(re, ''));
@@ -99,11 +99,10 @@ function formatNumber(numberString) {
                 numberArray.splice(newIndex+addedSpaces, 0, ' '); 
                 addedSpaces++
             }
-
             newIndex += 3;
         }
     }
-    return numberArray.join('') + afterDot;
+    return addedMinus ? '-' + numberArray.join('') + afterDot : numberArray.join('') + afterDot;
 }
 
 function operate(event) {
@@ -121,13 +120,15 @@ function operate(event) {
         if (!currentOperator) return;
         if (!storedNumber && currentOperator == 'equal') return;
         if (storedNumber) {
-            let result = operators[currentOperator][1](+storedNumber, +currentNumber);
-            const resultLength = String(result).replace(/[.]/, '').length;
+            let currentNumberArg = addedMinus ? +currentNumber * -1 : +currentNumber;
+            let result = operators[currentOperator][1](+storedNumber, currentNumberArg);
+            const resultLength = String(result).replace(/[.-]/g, '').length;
             if (resultLength > 12) {
                 clear();
                 currentText.innerText = 'Number is too big';
                 return;
             }
+            if (addedMinus) addedMinus = false;
             currentText.innerText = result ? formatNumber(String(result)) : 'yikes';
             currentNumber = String(result);
             storedNumber = null;
@@ -138,22 +139,28 @@ function operate(event) {
         }
     }
 
-    let result = storedNumber ? operators[currentOperator][1](+storedNumber, +currentNumber) : undefined;
+    let currentNumberArg = addedMinus ? +currentNumber * -1 : +currentNumber;
+    let result = storedNumber ? operators[currentOperator][1](+storedNumber, currentNumberArg) : undefined;
+    if (addedMinus && storedNumber) addedMinus = !addedMinus;
     
     if (result) {
-        const resultLength = String(result).replace(/[.]/, '').length;
+        const resultLength = String(result).replace(/[.-]/g, '').length;
         if (resultLength > 12) {
             clear();
             currentText.innerText = 'Number is too big';
             return;
         }
     }
-    if (result || currentNumber) {        
+    if (result || currentNumber) {     
         previousText.innerText = (result || result === 0 ? formatNumber(String(result)) : formatNumber(currentNumber)) + ' ' + operatorSymbol;
     };
 
     currentText.innerText = '0';
     storedNumber = storedNumber ? result : currentNumber;
+    if (addedMinus) {
+        storedNumber = '-' + storedNumber;
+        addedMinus = !addedMinus;
+    }
     if (storedNumber) styleOperatorBtn(event);
     currentOperator = operator;
     currentNumber = '';
@@ -182,7 +189,13 @@ function divide(x,y){
     const sum = x/y;
     if (Number.isInteger(sum)) return sum;
     const digitsAfterPoint = calcDecimals(x, y)
-    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
+    let digitsBeforeDot;
+    if (sum.toString(10).includes('.')) {
+        const digitsArray = sum.toString(10).split('.');
+        digitsBeforeDot = digitsArray[0].length;
+    }
+    
+    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum.toFixed(12 - digitsBeforeDot);
 }
 
 function clear() {
@@ -191,6 +204,7 @@ function clear() {
     currentOperator = undefined;
     previousText.innerText = '';
     currentText.innerText = '0';
+    addedMinus = false;
     styleOperatorBtn();
 }
 
