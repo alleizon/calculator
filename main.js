@@ -21,9 +21,9 @@ operatorBtnsArray.forEach(item => {
 });
 
 window.addEventListener('keydown', (event) => {
+    event.preventDefault();
     if (event.key in keys) operate(event);
     else if (event.key.match(/^[0-9.]$/)) updateCurrentField(event);
-    console.log(event.key.match(/^[0-9.]$/));
 });
 
 clearBtn.addEventListener('click', clear);
