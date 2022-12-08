@@ -20,6 +20,12 @@ operatorBtnsArray.forEach(item => {
     item.addEventListener('click', operate);
 });
 
+window.addEventListener('keydown', (event) => {
+    if (event.key in keys) operate(event);
+    else if (event.key.match(/^[0-9.]$/)) updateCurrentField(event);
+    console.log(event.key.match(/^[0-9.]$/));
+});
+
 clearBtn.addEventListener('click', clear);
 
 plusMinus.addEventListener('click', () => {
@@ -43,6 +49,14 @@ const operators = {
     equal: ['=', equal],
 }
 
+const keys = {
+    '+': 'add',
+    '-': 'subtract',
+    '*': 'multiply',
+    '/': 'divide',
+    '=': 'equal',
+}
+
 let currentOperator;
 
 // Functions
@@ -52,8 +66,8 @@ function updateCurrentField(e) {
         currentNumber = '';
         currentOperator = undefined;
     };
-
-    const number = e.target.textContent;
+    
+    const number = e.type == 'click' ? e.target.textContent : e.key;
     let containsDot = currentNumber.includes(".") ? true : false;
 
     if (number === '0' && !currentNumber) return;
@@ -106,7 +120,14 @@ function formatNumber(numberString) {
 }
 
 function operate(event) {
-    let operator = event.target.id;
+    let operator;
+    if (event.type == 'click') {
+        operator = event.target.id;
+    } else {
+        const key = event.key;
+        operator = keys[key]
+        console.log(operator);
+    }
     let operatorSymbol = operators[operator][0];
     
     if (!currentNumber && operator != 'equal' && storedNumber) {
@@ -170,26 +191,50 @@ function add(x,y){
     const sum = x+y;
     if (Number.isInteger(sum)) return sum;
     let digitsBeforeDot = calcDigitsBeforeDot(sum);
-    return sum.toFixed(12 - digitsBeforeDot);
+    const newSumArray = sum.toFixed(12 - digitsBeforeDot).split('');
+    let arrLength = newSumArray.length;
+    while (newSumArray[arrLength-1] == '0') {
+        newSumArray.pop();
+        arrLength--;
+    }
+    return newSumArray.join('');
 }
 function subtract(x,y){
     const sum = x-y;
     if (Number.isInteger(sum)) return sum;
     let digitsBeforeDot = calcDigitsBeforeDot(sum);
-    return sum.toFixed(12 - digitsBeforeDot);
+    const newSumArray = sum.toFixed(12 - digitsBeforeDot).split('');
+    let arrLength = newSumArray.length;
+    while (newSumArray[arrLength-1] == '0') {
+        newSumArray.pop();
+        arrLength--;
+    }
+    return newSumArray.join('');
 }
 function multiply(x,y){
     const sum = x*y;
     if (Number.isInteger(sum)) return sum;
     let digitsBeforeDot = calcDigitsBeforeDot(sum);
-    return sum.toFixed(12 - digitsBeforeDot);
+    const newSumArray = sum.toFixed(12 - digitsBeforeDot).split('');
+    let arrLength = newSumArray.length;
+    while (newSumArray[arrLength-1] == '0') {
+        newSumArray.pop();
+        arrLength--;
+    }
+    return newSumArray.join('');
 }
 function divide(x,y){
     if (y === 0) return;
     const sum = x/y;
     if (Number.isInteger(sum)) return sum;
     let digitsBeforeDot = calcDigitsBeforeDot(sum);
-    return sum.toFixed(12 - digitsBeforeDot);
+    const newSumArray = sum.toFixed(12 - digitsBeforeDot).split('');
+    let arrLength = newSumArray.length;
+    while (newSumArray[arrLength-1] == '0') {
+        newSumArray.pop();
+        arrLength--;
+    }
+    return newSumArray.join('');
 }
 
 function clear() {
@@ -201,7 +246,7 @@ function clear() {
     addedMinus = false;
     styleOperatorBtn();
 }
-
+321.4566*123
 function styleOperatorBtn(e) {
     if (!e || e.target.id == 'equal') {
         operatorBtnsArray.forEach(item => item.classList.remove('operator-activated'));
