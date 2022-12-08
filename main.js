@@ -169,33 +169,27 @@ function operate(event) {
 function add(x,y){
     const sum = x+y;
     if (Number.isInteger(sum)) return sum;
-    const digitsAfterPoint = calcDecimals(x, y)
-    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
+    let digitsBeforeDot = calcDigitsBeforeDot(sum);
+    return sum.toFixed(12 - digitsBeforeDot);
 }
 function subtract(x,y){
     const sum = x-y;
     if (Number.isInteger(sum)) return sum;
-    const digitsAfterPoint = calcDecimals(x, y)
-    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
+    let digitsBeforeDot = calcDigitsBeforeDot(sum);
+    return sum.toFixed(12 - digitsBeforeDot);
 }
 function multiply(x,y){
     const sum = x*y;
     if (Number.isInteger(sum)) return sum;
-    const digitsAfterPoint = calcDecimals(x, y)
-    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum;
+    let digitsBeforeDot = calcDigitsBeforeDot(sum);
+    return sum.toFixed(12 - digitsBeforeDot);
 }
 function divide(x,y){
     if (y === 0) return;
     const sum = x/y;
     if (Number.isInteger(sum)) return sum;
-    const digitsAfterPoint = calcDecimals(x, y)
-    let digitsBeforeDot;
-    if (sum.toString(10).includes('.')) {
-        const digitsArray = sum.toString(10).split('.');
-        digitsBeforeDot = digitsArray[0].length;
-    }
-    
-    return digitsAfterPoint ? sum.toFixed(digitsAfterPoint) : sum.toFixed(12 - digitsBeforeDot);
+    let digitsBeforeDot = calcDigitsBeforeDot(sum);
+    return sum.toFixed(12 - digitsBeforeDot);
 }
 
 function clear() {
@@ -208,14 +202,6 @@ function clear() {
     styleOperatorBtn();
 }
 
-function calcDecimals(x, y) {
-    const xArray = x.toString(10).includes('.') ? x.toString(10).split('.') : 0;
-    const yArray = y.toString(10).includes('.') ? y.toString(10).split('.') : 0;
-    xLength = xArray ? xArray[1].length : 0;
-    yLength = yArray ? yArray[1].length : 0;
-    return xLength>yLength ? xLength : yLength;
-}
-
 function styleOperatorBtn(e) {
     if (!e || e.target.id == 'equal') {
         operatorBtnsArray.forEach(item => item.classList.remove('operator-activated'));
@@ -224,4 +210,9 @@ function styleOperatorBtn(e) {
         previousBtn.classList.remove('operator-activated');
         e.target.classList.add('operator-activated');    
     }
+}
+
+function calcDigitsBeforeDot(sum) {
+    const digitsArray = sum.toString(10).split('.');
+    return digitsArray[0].length;
 }
