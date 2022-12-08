@@ -126,7 +126,6 @@ function operate(event) {
     } else {
         const key = event.key;
         operator = keys[key]
-        console.log(operator);
     }
     let operatorSymbol = operators[operator][0];
     
@@ -246,14 +245,28 @@ function clear() {
     addedMinus = false;
     styleOperatorBtn();
 }
-321.4566*123
+
 function styleOperatorBtn(e) {
-    if (!e || e.target.id == 'equal') {
-        operatorBtnsArray.forEach(item => item.classList.remove('operator-activated'));
+    if (e.type == 'click') {
+        if (!e || e.target.id == 'equal') {
+            operatorBtnsArray.forEach(item => item.classList.remove('operator-activated'));
+        } else {
+            const previousBtn = currentOperator ? document.querySelector(`#${currentOperator}`) : e.target;
+            previousBtn.classList.remove('operator-activated');
+            
+            e.target.classList.add('operator-activated');    
+        }
     } else {
-        const previousBtn = currentOperator ? document.querySelector(`#${currentOperator}`) : e.target;
-        previousBtn.classList.remove('operator-activated');
-        e.target.classList.add('operator-activated');    
+        if (!e || e.key == '=') {
+            operatorBtnsArray.forEach(item => item.classList.remove('operator-activated'));
+        }
+        else {
+            const previousBtn = currentOperator ? document.querySelector(`#${currentOperator}`) : document.querySelector(`#${keys[e.key]}`);
+            previousBtn.classList.remove('operator-activated');
+            
+            const target = document.querySelector(`#${keys[e.key]}`);
+            target.classList.add('operator-activated');
+        }
     }
 }
 
